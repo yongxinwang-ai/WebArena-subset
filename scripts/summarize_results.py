@@ -13,6 +13,18 @@ def load_bucket_map(meta_path: Path) -> dict[int, dict[str, Any]]:
     return {int(item["task_id"]): item for item in meta.get("tasks", [])}
 
 
+def load_jsonl(path: Path) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        item = json.loads(line)
+        item["_result_path"] = str(path)
+        records.append(item)
+    return records
+
+
 def find_result_files(path: Path) -> list[Path]:
     if path.name.startswith("webarena.") and (path / "result.json").exists():
         return [path / "result.json"]
@@ -32,16 +44,33 @@ def main() -> int:
 
     task_meta = load_bucket_map(args.meta)
     results: list[dict[str, Any]] = []
-    for path in find_result_files(args.run_path):
-        try:
-            item = json.loads(path.read_text(encoding="utf-8"))
-        except Exception as exc:
-            item = {"status": "parse_error", "error": f"{type(exc).__name__}: {exc}"}
+    jsonl_inputs: list[Path] = []
+    if args.run_path.is_file() and args.run_path.suffix == ".jsonl":
+        jsonl_inputs = [args.run_path]
+    elif args.run_path.is_dir():
+        jsonl_inputs = sorted(args.run_path.glob("*_results.jsonl"))
+
+    if jsonl_inputs:
+        for path in jsonl_inputs:
+            try:
+                results.extend(load_jsonl(path))
+            except Exception as exc:
+                results.append(
+                    {"status": "parse_error", "error": f"{type(exc).__name__}: {exc}", "_result_path": str(path)}
+                )
+    else:
+        for path in find_result_files(args.run_path):
+            try:
+                item = json.loads(path.read_text(encoding="utf-8"))
+            except Exception as exc:
+                item = {"status": "parse_error", "error": f"{type(exc).__name__}: {exc}"}
+            item["_result_path"] = str(path)
+            results.append(item)
+
+    for item in results:
         task_id = int(item.get("task_id", -1))
-        item["_result_path"] = str(path)
         item["_bucket"] = task_meta.get(task_id, {}).get("bucket", "unknown")
         item["_sites"] = task_meta.get(task_id, {}).get("sites", "unknown")
-        results.append(item)
 
     status_counts = Counter(item.get("status", "unknown") for item in results)
     bucket_counts: dict[str, Counter[str]] = defaultdict(Counter)
@@ -86,4 +115,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

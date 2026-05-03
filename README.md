@@ -11,12 +11,17 @@ http://18.117.39.199
 ## Contents
 
 - `configs/domain50_tasks.txt`: 50 WebArena task ids.
+- `configs/domain50_tasks_expanded.jsonl`: expanded task metadata for external harnesses.
 - `configs/domain50_meta.json`: selection policy and per-task domain metadata.
 - `configs/webarena_env_aws.sh`: WebArena service URLs for the current AWS node.
+- `configs/harnesses.example.json`: BrowserGym/OpenClaw/browser-use adapter examples.
 - `harness/run_webarena_text_eval.py`: OpenAI-compatible text-only BrowserGym agent harness.
 - `slurm/run_webarena_parallel_array.sbatch`: Slurm array wrapper.
 - `scripts/submit_eval.sh`: team-facing submit command.
 - `scripts/summarize_results.py`: aggregate success rate and domain-level results.
+- `scripts/export_domain50_tasks.py`: export WebArena task goals/start URLs into JSONL.
+- `scripts/run_external_harness.py`: run the same 50 tasks through external harness commands.
+- `docs/harness_adapters.md`: notes for OpenClaw, OpenClaw+browser-use, and Browser Use Cloud adapters.
 - `results/gpt_5_4_headless_20260502_summary.json`: baseline summary from the initial `gpt-5.4` run.
 
 ## Subset
@@ -61,6 +66,21 @@ Defaults:
 - `WEBARENA_BASE_URL=http://18.117.39.199`
 
 Keep `ARRAY_CONCURRENCY=1` unless you deploy independent WebArena state, because tasks share the same AWS site databases.
+
+## Other Harnesses
+
+BrowserGym is the authoritative path for official WebArena reward. External harnesses can still run the same 50 tasks by consuming `configs/domain50_tasks_expanded.jsonl`.
+
+```bash
+scripts/export_domain50_tasks.py
+
+scripts/run_external_harness.py \
+  --output-root runs/openclaw_pure_gpt54 \
+  --harness-name openclaw_pure \
+  --command 'cd "$OPENCLAW_REPO" && ${OPENCLAW_CMD:-openclaw} run --task "$TASK_GOAL" --start-url "$START_URL" --output "$OUTPUT_DIR"'
+```
+
+External harness outputs are normalized into per-task `result.json`, but `reward` is `null` by default because many WebArena tasks require official page-state, URL, or programmatic HTML evaluators. See `docs/harness_adapters.md`.
 
 ## Monitor
 

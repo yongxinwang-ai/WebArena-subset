@@ -1,0 +1,29 @@
+{
+  "browsergym_text": {
+    "type": "browsergym",
+    "reward": "webarena_official",
+    "submit": "scripts/submit_eval.sh",
+    "notes": "Default supported path. Runs inside BrowserGym and gets authoritative WebArena reward."
+  },
+  "openclaw_pure_template": {
+    "type": "external_command",
+    "reward": "external_or_judge_required",
+    "command": "cd ${OPENCLAW_REPO} && ${OPENCLAW_CMD:-openclaw} run --task \"${TASK_GOAL}\" --start-url \"${START_URL}\" --output \"${OUTPUT_DIR}\"",
+    "required_env": ["OPENCLAW_REPO", "MODEL", "BASE_URL", "API_KEY"],
+    "notes": "Template only. Replace OPENCLAW_CMD with the concrete OpenClaw CLI entrypoint used by your checkout."
+  },
+  "openclaw_browser_use_template": {
+    "type": "external_command",
+    "reward": "external_or_judge_required",
+    "command": "cd ${OPENCLAW_BROWSER_USE_REPO} && ${OPENCLAW_CMD:-openclaw} run --task \"${TASK_GOAL}\" --start-url \"${START_URL}\" --output \"${OUTPUT_DIR}\"",
+    "required_env": ["OPENCLAW_BROWSER_USE_REPO", "MODEL", "BASE_URL", "API_KEY"],
+    "notes": "Template only. Use for the OpenClaw checkout modified to call browser-use."
+  },
+  "browser_use_cloud_template": {
+    "type": "external_command",
+    "reward": "external_or_judge_required",
+    "command": "python ${BROWSER_USE_CLOUD_SCRIPT} --task \"${TASK_GOAL}\" --start-url \"${START_URL}\" --output-dir \"${OUTPUT_DIR}\"",
+    "required_env": ["BROWSER_USE_API_KEY", "BROWSER_USE_CLOUD_SCRIPT", "MODEL", "BASE_URL", "API_KEY"],
+    "notes": "Template only. Requires a script that invokes Browser Use Cloud and writes normalized output."
+  }
+}

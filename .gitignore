@@ -1,0 +1,9 @@
+runs/
+*.log
+*.out
+*.err
+__pycache__/
+.pytest_cache/
+.env
+.venv/
+

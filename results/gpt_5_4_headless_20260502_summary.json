@@ -1,0 +1,62 @@
+{
+  "run_path": "/mnt/weka/home/yongxin.wang/workspace/Data/browsergym_webarena_eval/runs/webarena_domain50_gpt54_20260502_now/gpt_5_4_headless",
+  "total": 50,
+  "success": 20,
+  "success_rate": 0.4,
+  "status_counts": {
+    "failure": 30,
+    "success": 20
+  },
+  "bucket_counts": {
+    "gitlab": {
+      "failure": 4,
+      "success": 4
+    },
+    "map": {
+      "failure": 4,
+      "success": 4
+    },
+    "reddit": {
+      "success": 6,
+      "failure": 2
+    },
+    "shopping": {
+      "failure": 5,
+      "success": 3
+    },
+    "shopping_admin": {
+      "failure": 6,
+      "success": 2
+    },
+    "wikipedia_or_cross_site": {
+      "failure": 9,
+      "success": 1
+    }
+  },
+  "site_counts": {
+    "gitlab": {
+      "failure": 9,
+      "success": 4
+    },
+    "map": {
+      "failure": 8,
+      "success": 5
+    },
+    "reddit": {
+      "success": 6,
+      "failure": 6
+    },
+    "shopping": {
+      "failure": 5,
+      "success": 3
+    },
+    "shopping_admin": {
+      "failure": 7,
+      "success": 2
+    },
+    "wikipedia": {
+      "failure": 4,
+      "success": 1
+    }
+  }
+}
